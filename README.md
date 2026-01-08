@@ -54,6 +54,32 @@ for node in link_iterator(start):
 - Undo/redo systems
 - Scene graphs in graphics engines
 
+## Implementations
+
+This project includes three implementations of the mutable chain pattern:
+
+- **Python**: [mutable_chain.py](mutable_chain.py) - Original implementation with detailed documentation
+- **C**: [mutable_chain.c](mutable_chain.c) - C implementation using pointer wrappers
+- **C++**: [mutable_chain.cpp](mutable_chain.cpp) - Modern C++ implementation using `shared_ptr`
+
+## Building and Running
+
+### Python
+```bash
+python mutable_chain.py
+```
+
+### C/C++ (using CMake)
+```bash
+mkdir build && cd build
+cmake ..
+cmake --build .
+./bin/mutable_chain_c    # Run C version
+./bin/mutable_chain_cpp  # Run C++ version
+```
+
+See [BUILD.md](BUILD.md) for detailed build instructions and alternative compilation methods.
+
 ## See the Details
 
 Check [mutable_chain.py](mutable_chain.py) for the full implementation and deep dive into how the deletion mechanism works.
