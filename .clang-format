@@ -1,0 +1,48 @@
+# Clang-format configuration for mutable_chain project
+# Run: clang-format -i *.cpp *.c
+
+BasedOnStyle: Microsoft
+Language: Cpp
+Standard: c++17
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+IndentCaseLabels: true
+NamespaceIndentation: None
+
+# Braces - Allman style (opening brace on new line)
+BreakBeforeBraces: Allman
+
+# Line length
+ColumnLimit: 100
+
+# Pointer/Reference alignment (space before: T &value)
+PointerAlignment: Right
+ReferenceAlignment: Right
+
+# Spaces
+SpaceBeforeParens: ControlStatements
+SpaceAfterTemplateKeyword: true
+SpacesInAngles: false
+SpaceBeforeAssignmentOperators: true
+
+# Single-line control statements
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+# Keep includes sorted
+SortIncludes: true
+IncludeBlocks: Preserve
+
+# Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignTrailingComments: true
+
+# Other
+FixNamespaceComments: true
+ReflowComments: false

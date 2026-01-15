@@ -116,8 +116,9 @@
  * @endcode
  */
 template <typename T>
-struct Ref {
-    std::shared_ptr<T> ptr;  ///< The actual pointer, mutable for indirection
+struct Ref
+{
+    std::shared_ptr<T> ptr; ///< The actual pointer, mutable for indirection
     explicit Ref(std::shared_ptr<T> p) : ptr(std::move(p)) {}
 };
 
@@ -130,20 +131,21 @@ struct Ref {
  * @tparam T The value type stored in this node
  */
 template <typename T>
-struct ListNode {
-    using RefType = Ref<ListNode<T>>;      ///< The Ref type for this node
+struct ListNode
+{
+    using RefType = Ref<ListNode<T>>;        ///< The Ref type for this node
     using RefPtr = std::shared_ptr<RefType>; ///< Shared pointer to Ref
 
-    RefPtr next;   ///< Forward link (wrapped for safe mutation)
-    RefPtr prev;   ///< Backward link (wrapped for safe mutation)
-    T value;       ///< The stored value
+    RefPtr next; ///< Forward link (wrapped for safe mutation)
+    RefPtr prev; ///< Backward link (wrapped for safe mutation)
+    T value;     ///< The stored value
 
     /// Default constructor for sentinel nodes (no value initialization)
     ListNode() = default;
 
     /// Value constructor with perfect forwarding
     template <typename... Args>
-    explicit ListNode(Args&&... args) : value(std::forward<Args>(args)...) {}
+    explicit ListNode(Args &&...args) : value(std::forward<Args>(args)...) {}
 };
 
 /**
@@ -170,17 +172,18 @@ struct ListNode {
  * @endcode
  */
 template <typename T, typename Allocator = std::allocator<T>>
-class MutableList {
+class MutableList
+{
 public:
     // ========================================================================
     // STL TYPE ALIASES
     // ========================================================================
-    using value_type = T;                    ///< Element type
-    using allocator_type = Allocator;        ///< Allocator type
-    using size_type = std::size_t;           ///< Unsigned integer type for sizes
-    using difference_type = std::ptrdiff_t;  ///< Signed integer type for differences
-    using reference = value_type&;           ///< Reference to element
-    using const_reference = const value_type&;  ///< Const reference to element
+    using value_type = T;                       ///< Element type
+    using allocator_type = Allocator;           ///< Allocator type
+    using size_type = std::size_t;              ///< Unsigned integer type for sizes
+    using difference_type = std::ptrdiff_t;     ///< Signed integer type for differences
+    using reference = value_type &;             ///< Reference to element
+    using const_reference = const value_type &; ///< Const reference to element
     using pointer = typename std::allocator_traits<Allocator>::pointer;
     using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
 
@@ -190,9 +193,9 @@ private:
     using RefType = typename Node::RefType;
     using RefPtr = typename Node::RefPtr;
 
-    NodePtr head_;     ///< Sentinel node before first element
-    NodePtr tail_;     ///< Sentinel node after last element
-    size_type size_ = 0;  ///< Number of elements
+    NodePtr head_;       ///< Sentinel node before first element
+    NodePtr tail_;       ///< Sentinel node after last element
+    size_type size_ = 0; ///< Number of elements
 
     /**
      * @brief Create bidirectional link between two nodes using Ref wrappers.
@@ -200,13 +203,15 @@ private:
      * This is the key linking operation. It creates NEW Ref objects for
      * each direction. The Ref wrappers enable later mutation.
      */
-    static void link(const NodePtr& a, const NodePtr& b) {
+    static void link(const NodePtr &a, const NodePtr &b)
+    {
         a->next = std::make_shared<RefType>(b);
         b->prev = std::make_shared<RefType>(a);
     }
 
     /// Create an empty sentinel node
-    static NodePtr makeSentinel() {
+    static NodePtr makeSentinel()
+    {
         return std::make_shared<Node>();
     }
 
@@ -226,7 +231,8 @@ public:
      * @tparam IsConst If true, produces const references
      */
     template <bool IsConst>
-    class IteratorImpl {
+    class IteratorImpl
+    {
         friend class MutableList;
         NodePtr current_;
 
@@ -235,45 +241,49 @@ public:
         using iterator_category = std::bidirectional_iterator_tag;
         using value_type = std::conditional_t<IsConst, const T, T>;
         using difference_type = std::ptrdiff_t;
-        using pointer = value_type*;
-        using reference = value_type&;
+        using pointer = value_type *;
+        using reference = value_type &;
 
         IteratorImpl() = default;
         explicit IteratorImpl(NodePtr node) : current_(std::move(node)) {}
 
         /// Allow conversion from non-const to const iterator
         template <bool WasConst, typename = std::enable_if_t<IsConst && !WasConst>>
-        IteratorImpl(const IteratorImpl<WasConst>& other) : current_(other.current_) {}
+        IteratorImpl(const IteratorImpl<WasConst> &other) : current_(other.current_) {}
 
         reference operator*() const { return current_->value; }
         pointer operator->() const { return &current_->value; }
 
         /// Pre-increment: advance to next node via Ref indirection
-        IteratorImpl& operator++() {
+        IteratorImpl &operator++()
+        {
             current_ = current_->next->ptr;
             return *this;
         }
 
-        IteratorImpl operator++(int) {
+        IteratorImpl operator++(int)
+        {
             IteratorImpl tmp = *this;
             ++(*this);
             return tmp;
         }
 
         /// Pre-decrement: move to previous node via Ref indirection
-        IteratorImpl& operator--() {
+        IteratorImpl &operator--()
+        {
             current_ = current_->prev->ptr;
             return *this;
         }
 
-        IteratorImpl operator--(int) {
+        IteratorImpl operator--(int)
+        {
             IteratorImpl tmp = *this;
             --(*this);
             return tmp;
         }
 
-        bool operator==(const IteratorImpl& o) const { return current_ == o.current_; }
-        bool operator!=(const IteratorImpl& o) const { return current_ != o.current_; }
+        bool operator==(const IteratorImpl &o) const { return current_ == o.current_; }
+        bool operator!=(const IteratorImpl &o) const { return current_ != o.current_; }
 
         /// Get underlying node pointer (for erase operations)
         NodePtr node() const { return current_; }
@@ -289,25 +299,31 @@ public:
     // ========================================================================
 
     /// Default constructor: creates empty list with sentinel nodes
-    MutableList() : head_(makeSentinel()), tail_(makeSentinel()) {
+    MutableList() : head_(makeSentinel()), tail_(makeSentinel())
+    {
         link(head_, tail_);
     }
 
     /// Initializer list constructor
-    MutableList(std::initializer_list<T> init) : MutableList() {
-        for (const auto& v : init) push_back(v);
+    MutableList(std::initializer_list<T> init) : MutableList()
+    {
+        for (const auto &v : init)
+            push_back(v);
     }
 
     /// Copy constructor
-    MutableList(const MutableList& other) : MutableList() {
-        for (const auto& v : other) push_back(v);
+    MutableList(const MutableList &other) : MutableList()
+    {
+        for (const auto &v : other)
+            push_back(v);
     }
 
     /// Move constructor
-    MutableList(MutableList&& other) noexcept
+    MutableList(MutableList &&other) noexcept
         : head_(std::move(other.head_)),
           tail_(std::move(other.tail_)),
-          size_(other.size_) {
+          size_(other.size_)
+    {
         other.head_ = makeSentinel();
         other.tail_ = makeSentinel();
         link(other.head_, other.tail_);
@@ -315,13 +331,15 @@ public:
     }
 
     /// Copy/move assignment (copy-and-swap idiom)
-    MutableList& operator=(MutableList other) {
+    MutableList &operator=(MutableList other)
+    {
         swap(other);
         return *this;
     }
 
     /// Swap contents with another list
-    void swap(MutableList& other) noexcept {
+    void swap(MutableList &other) noexcept
+    {
         std::swap(head_, other.head_);
         std::swap(tail_, other.tail_);
         std::swap(size_, other.size_);
@@ -372,7 +390,8 @@ public:
     // ========================================================================
 
     /// Remove all elements
-    void clear() {
+    void clear()
+    {
         link(head_, tail_);
         size_ = 0;
     }
@@ -383,7 +402,8 @@ public:
      * @return Reference to the inserted element
      */
     template <typename... Args>
-    reference emplace_back(Args&&... args) {
+    reference emplace_back(Args &&...args)
+    {
         auto node = std::make_shared<Node>(std::forward<Args>(args)...);
         auto last = tail_->prev->ptr;
         link(last, node);
@@ -393,10 +413,10 @@ public:
     }
 
     /// Add element to the end (copy)
-    void push_back(const T& value) { emplace_back(value); }
+    void push_back(const T &value) { emplace_back(value); }
 
     /// Add element to the end (move)
-    void push_back(T&& value) { emplace_back(std::move(value)); }
+    void push_back(T &&value) { emplace_back(std::move(value)); }
 
     /**
      * @brief Construct element in-place at the beginning.
@@ -404,7 +424,8 @@ public:
      * @return Reference to the inserted element
      */
     template <typename... Args>
-    reference emplace_front(Args&&... args) {
+    reference emplace_front(Args &&...args)
+    {
         auto node = std::make_shared<Node>(std::forward<Args>(args)...);
         auto first = head_->next->ptr;
         link(head_, node);
@@ -414,19 +435,23 @@ public:
     }
 
     /// Add element to the beginning (copy)
-    void push_front(const T& value) { emplace_front(value); }
+    void push_front(const T &value) { emplace_front(value); }
 
     /// Add element to the beginning (move)
-    void push_front(T&& value) { emplace_front(std::move(value)); }
+    void push_front(T &&value) { emplace_front(std::move(value)); }
 
     /// Remove the last element
-    void pop_back() {
-        if (!empty()) erase(iterator(tail_->prev->ptr));
+    void pop_back()
+    {
+        if (!empty())
+            erase(iterator(tail_->prev->ptr));
     }
 
     /// Remove the first element
-    void pop_front() {
-        if (!empty()) erase(begin());
+    void pop_front()
+    {
+        if (!empty())
+            erase(begin());
     }
 
     /**
@@ -448,14 +473,15 @@ public:
      *     }
      * @endcode
      */
-    iterator erase(iterator pos) {
+    iterator erase(iterator pos)
+    {
         auto node = pos.node();
         auto pred = node->prev->ptr;
         auto succ = node->next->ptr;
         // CRITICAL: Update Ref CONTENTS, not reassign pointers
         // This is what enables safe deletion during iteration
-        pred->next->ptr = succ;  // A->B->C becomes A->C
-        succ->prev->ptr = pred;  // C's prev updated from B to A
+        pred->next->ptr = succ; // A->B->C becomes A->C
+        succ->prev->ptr = pred; // C's prev updated from B to A
         --size_;
         return iterator(succ);
     }
@@ -468,7 +494,8 @@ public:
      *
      * @param node The node to remove
      */
-    void erase_node(const NodePtr& node) {
+    void erase_node(const NodePtr &node)
+    {
         auto pred = node->prev->ptr;
         auto succ = node->next->ptr;
         pred->next->ptr = succ;
@@ -479,36 +506,43 @@ public:
 
 /// Free function swap for ADL (Argument-Dependent Lookup)
 template <typename T, typename A>
-void swap(MutableList<T, A>& a, MutableList<T, A>& b) noexcept { a.swap(b); }
+void swap(MutableList<T, A> &a, MutableList<T, A> &b) noexcept { a.swap(b); }
 
 // ============================================================================
 // EXAMPLE USAGE
 // ============================================================================
 
-int main() {
+int main()
+{
     // Works with any type - using initializer list
     MutableList<std::string> list{"data1!", "data2!", "data3!"};
 
     // Forward iteration with safe deletion - Python-style, no special handling!
     std::cout << "Forward iteration (delete data1):\n";
-    for (auto it = list.begin(); it != list.end(); ++it) {
-        if (*it == "data1!") {
+    for (auto it = list.begin(); it != list.end(); ++it)
+    {
+        if (*it == "data1!")
+        {
             std::cout << "  removing: " << *it << '\n';
-            list.erase(it);  // Just delete! Iterator continues correctly.
-        } else {
+            list.erase(it); // Just delete! Iterator continues correctly.
+        }
+        else
+        {
             std::cout << "  - " << *it << '\n';
         }
     }
 
     // Reverse iteration using STL reverse_iterator
     std::cout << "\nReverse iteration:\n";
-    for (auto it = list.rbegin(); it != list.rend(); ++it) {
+    for (auto it = list.rbegin(); it != list.rend(); ++it)
+    {
         std::cout << "  - " << *it << '\n';
     }
 
     // Range-based for loop
     std::cout << "\nRange-based for:\n";
-    for (const auto& s : list) {
+    for (const auto &s : list)
+    {
         std::cout << "  - " << s << '\n';
     }
 
@@ -520,6 +554,7 @@ int main() {
     // Works with other types
     MutableList<int> numbers{1, 2, 3, 4, 5};
     std::cout << "\nIntegers: ";
-    for (int n : numbers) std::cout << n << ' ';
+    for (int n : numbers)
+        std::cout << n << ' ';
     std::cout << '\n';
 }
