@@ -83,11 +83,10 @@ The C++ implementation provides an STL-compliant generic container:
 ```cpp
 MutableList<std::string> list{"a", "b", "c"};
 
-// Safe deletion during iteration
+// Safe deletion during iteration - just like Python!
 for (auto it = list.begin(); it != list.end(); ++it) {
     if (*it == "b") {
-        it = list.erase(it);
-        --it;  // Compensate for loop's ++it
+        list.erase(it);  // Just delete! No special handling needed.
     }
 }
 

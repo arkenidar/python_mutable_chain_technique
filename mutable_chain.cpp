@@ -161,11 +161,10 @@ struct ListNode {
  * @code
  *     MutableList<std::string> list{"a", "b", "c"};
  *
- *     // Safe deletion during iteration
+ *     // Safe deletion during iteration - just like Python!
  *     for (auto it = list.begin(); it != list.end(); ++it) {
  *         if (*it == "b") {
- *             it = list.erase(it);
- *             --it;  // Compensate for loop's ++it
+ *             list.erase(it);  // No special handling needed!
  *         }
  *     }
  * @endcode
@@ -444,8 +443,7 @@ public:
      * @code
      *     for (auto it = list.begin(); it != list.end(); ++it) {
      *         if (should_remove(*it)) {
-     *             it = list.erase(it);
-     *             --it;  // Compensate for loop's ++it
+     *             list.erase(it);  // Just delete - iterator continues correctly!
      *         }
      *     }
      * @endcode
@@ -491,13 +489,12 @@ int main() {
     // Works with any type - using initializer list
     MutableList<std::string> list{"data1!", "data2!", "data3!"};
 
-    // Forward iteration with safe deletion
+    // Forward iteration with safe deletion - Python-style, no special handling!
     std::cout << "Forward iteration (delete data1):\n";
     for (auto it = list.begin(); it != list.end(); ++it) {
         if (*it == "data1!") {
             std::cout << "  removing: " << *it << '\n';
-            it = list.erase(it);
-            --it;  // Compensate for ++it in loop
+            list.erase(it);  // Just delete! Iterator continues correctly.
         } else {
             std::cout << "  - " << *it << '\n';
         }
