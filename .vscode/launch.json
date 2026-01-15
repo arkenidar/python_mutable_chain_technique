@@ -5,6 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "lua-local",
+            "request": "launch",
+            "name": ".lua Debug Lua version mutable_chain.lua",
+            "program": {
+                "lua": "luajit",
+                "file": "mutable_chain.lua"
+            },
+            "stopOnEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
             "name": "[mc.py] Python Debugger: mutable_chain.py File",
             "type": "debugpy",
             "request": "launch",
