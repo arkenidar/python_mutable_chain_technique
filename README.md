@@ -157,8 +157,19 @@ See [BUILD.md](BUILD.md) for detailed build instructions.
 ├── mutable_chain.rb      # Ruby
 ├── CMakeLists.txt        # CMake build for C/C++
 ├── BUILD.md              # Detailed build instructions
+├── docs/                  # Conceptual + process record (CONVERSATION, RECORD)
+├── stable_cell/           # The stable cell primitive (JS + Nim)
+├── copy_jump_vm/          # Compile-time reclamation experiment (copy/jump/peek/poke)
 └── README.md             # This file
 ```
+
+## Related: The Stable Cell Primitive
+
+The stable cell (the `[t]` / `c[0]` / `c[0] = t` mutable-box pattern) is the
+primitive underneath this technique — see [stable_cell/README.md](stable_cell/README.md)
+for the spec and runnable JS/Nim implementations, [docs/CONVERSATION.md](docs/CONVERSATION.md)
+for the full conceptual write-up, and [copy_jump_vm/README.md](copy_jump_vm/README.md)
+for the compile-time reclamation experiment.
 
 ## License
 
