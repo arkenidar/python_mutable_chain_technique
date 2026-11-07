@@ -207,3 +207,107 @@ so that every *component* stays a bounded, decidable FST and only their *composi
 unbounded. The seed, the colony, and the stream are three names for the same move:
 **keep every part finite and verifiable; put the unboundedness in the composition.**
 
+## 10. The Kolmogorov benchmark — competing against the decompression families
+
+Full C-expressivity (`cc.py` + software ALU + software stack) means **every known
+decompressor can be implemented on the machine** — so we can compare them not by ratio
+but by the true Kolmogorov objective `K(x) = |decompressor| + |data|`.
+
+The Hutter Prize (and x86 benchmarks) measure `|decompressor|` in *compiled C on a rich
+ISA*, where it is dominated by compiler/ISA noise — so effectively only `|data|` (the
+ratio) is measured, and the "program" half of K is invisible. On the minimal machine,
+`|decompressor|` is counted in **bit-instructions** — the actual size of the algorithm —
+so **both terms of K become faithful and comparable**.
+
+The experiment: implement each family (LZ77/LZW dictionary, Huffman prefix, arithmetic
+coding, BWT+MTF, PPM prediction, context mixing), measure `|program|` + `|data|` per
+family on a corpus, and plot the **Pareto frontier** (program size × data size). The
+striking, measurable question is the **Kolmogorov crossover point**: *at what corpus
+size does a sophisticated algorithm's better ratio pay back its own program-size cost?*
+On a minimal machine the likely answer is: **simple, loop-synthesized LZ wins for
+surprisingly large inputs**, because its decompressor is a few hundred bit-instructions
+while context mixing's is ~10⁵–10⁶. Loop synthesis (bit-serial, §29.7) is decisive: it
+keeps the tiny decompressors tiny. The honest cost is the compiler effort to bit-serially
+implement arithmetic coding / context mixing — the `cc.py` + loop-synthesis +
+data-structures work.
+
+## 11. Novelty & positioning (honest)
+
+Most of the above is **well-known CS, correctly rediscovered and connected**; the
+novelty is narrow and mostly still ahead (in results, not yet claimed).
+
+**Not novel** (with sources): compression-as-intelligence (Hutter); minimal
+single-instruction machines (BitBitJump / OISC); software ALU from gates/full-adders;
+software call stack + ABI (cdecl); the stable cell (OCaml `ref`, Rust `Cell`, Clojure
+`Atom`); data-reactivity (Solid/MobX/Vue); bounded → decidable halting (LBA);
+dataflow / SSA / BDD; grammar compression (RePair/SEQUITUR); equality saturation
+(`egg`); logic synthesis (ABC/Espresso); procedural abstraction (ICF/outlining);
+superoptimization (Massalin/Souper/STOKE); bit-serial / loop synthesis; self-extraction,
+layered bootstrapping, cellular automata, finite-state transducers.
+
+**Partially novel** — (1) *RESM/BBJJ* as a specific OISC: copy + 2-way branch on a
+path-selector bit, `@` peek/poke as an addressing mode, single-instruction yet a
+generic C target; (2) the *Kolmogorov-benchmark lens* (§29.10): making `|program|` a
+faithful measurable term via the minimal ISA — the freshest idea here; (3) the
+*synthesis / framing* (origin → machine → ABI → cell / verifiability / data-relations →
+reduction → seed / colony / stream), and the connection "outliner v2 = parameterized
+sub-relation detection".
+
+**Where real novelty would come from (still open):** a measured crossover point; an
+approximation ratio for *ported* bit-DAGs (RePair's O(log n) is for strings); a
+loop-synthesis technique for non-obvious bit-serial loops; a symbolic canonical form
+that stays small for large inputs.
+
+Net: ~90% known / connected, ~10% partially novel, and the citable result — if any —
+is still in the experiments not yet run.
+
+## 12. Performance: time = instructions (size ≈ speed)
+
+The machine executes one instruction per step — no parallelism, no pipelining, no
+cache — so the only speed metric is **instructions executed**. For straight-line code
+every instruction runs once, so **time = program size**: the §29.7 size-reduction
+(canonicalize + hash-cons + greedy factoring) *is* a performance optimizer. The only
+genuine time/space axis is **loop vs. unroll** (loop = small+slow, unroll = big+fast) —
+the Pebble-game / time-space trade-off (Pippenger 1981), roadmap direction 5. The
+"atypical" discovery: on this machine, optimizing size and speed *collapse* (for
+straight-line code), and the entire time/space trade-off reduces to loop/unroll
+scheduling.
+
+## 13. Evolution: mutation + verification (safe synthesis), and crossover = invention
+
+Compile a proven codec, then mutate/rewrite its bit-level code and keep only
+*verified* mutants — **randomized superoptimization** (STOKE) on the minimal machine,
+made **safe** by §29.5 decidable equivalence (fixed-input: run it; all-input: FST
+product construction). Seeding a **genetic algorithm** with proven codecs gives
+**informed search**; 1-bit granularity gives the finest mutations. **Invention is
+possible**: GP has genuinely invented (Koza's reinvented patents; NASA's ST5 antenna).
+The distinction is *operator*, not *possibility*: **mutation = tuning** (local);
+**crossover = recombination** (novel hybrids — genuine invention); the one rare case is
+inventing a *brand-new primitive/abstraction* from scratch. On this machine the
+**function ABI makes programs modular**, so **module-level crossover** (recombine
+match-finder / dictionary / entropy-coder / predictor sub-routines) can hybridize
+proven codecs — which is how cmix and LZMA were themselves composed. Fitness is exact
+(size, speed = instructions, ratio); acceptance is a proof.
+
+## 14. The tower of abstraction: ideas span layers
+
+The machine is the *bottom* of a tower, and inventions live *up* the tower:
+
+```
+L5 ideas            compression-as-modeling · Kolmogorov · seed/colony/stream
+L4 codec concepts   dictionary · entropy coder · predictor · transform
+L3 algorithms       arrays · pointers · lists · hashing · recursion
+L2 C-like language  types · operators · statements          (cc.py)
+L1 ABI              functions · call stack · return         (callstack_gen.py)
+L0 bits             copy + branch (+ peek/poke addressing)   (RESM/BBJJ)
+```
+
+Each layer compiles down to the one below, and each has its *own* building blocks,
+operators, and kind of invention (L0 micro-mutations … L4 module recombination … L5
+conceptual leaps). So the search/evolution must **span layers with layer-matched
+operators**: a dictionary is an L4 concept — unreachable by L0 bit-mutations, but
+reachable by L4 module crossover. "Intelligence" is a high-layer property (L4/L5),
+*realized* — not created — by the low-level code. The machine's value is being the
+clearest possible **floor** (one instruction, one bit) for the whole tower.
+
+
