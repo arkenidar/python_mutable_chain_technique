@@ -477,6 +477,31 @@ input sizes (which is what Turing-completeness requires anyway). The impossibili
 theorem only concerns *unbounded* systems, so a bounded design resolves the
 tension in favor of knowability - a feature, not a limitation.
 
+## 25. Restrictions needed for compositional knowability
+
+Yes - composition must be restricted, and the restrictions are the two that make
+compositional reasoning sound, plus finite interfaces:
+
+1. **Acyclic / well-founded composition** (no unbounded feedback) -> preserves
+   liveness knowability (termination, reclamation). A looping component is a
+   fixed point, not a finite function, so it cannot be summarized; well-foundedness
+   restores a finite summary.
+2. **No shared mutable state across boundaries** (interface-only, no aliasing) ->
+   preserves summarizability / modular verification. Shared mutable state means no
+   closed summary exists.
+3. **Finite bounded interfaces** -> preserves finiteness of summaries.
+
+Property ladder: safety needs (2)+(3); liveness adds (1); full correctness adds
+complete boundary specs (theorem proving).
+
+Concretely: acyclic composition of finite transducers is always fully knowable;
+feedback (cyclic) composition needs a termination bound to stay knowable.
+
+These are the "restricted core" (boundedness + no-aliasing) restated at the
+composition level; the stable cell (deliberate aliasing) is exactly the thing
+needing the most care - shared mutable cells must be single-owned + borrowed or
+immutable to stay compositional.
+
 ## Chronological summary
 
 1. Studied `mutable_chain.*` (7 ports) — the list-wrapper indirection pattern.
