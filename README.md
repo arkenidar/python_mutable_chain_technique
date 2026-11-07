@@ -169,7 +169,7 @@ The stable cell (the `[t]` / `c[0]` / `c[0] = t` mutable-box pattern) is the
 primitive underneath this technique — see [stable_cell/README.md](stable_cell/README.md)
 for the spec and runnable JS/Nim implementations, [docs/CONVERSATION.md](docs/CONVERSATION.md)
 for the full conceptual write-up, and [copy_jump_vm/README.md](copy_jump_vm/README.md)
-for the compile-time reclamation experiment.
+for the compile-time reclamation experiment. A complete synthesis is in [docs/THESIS.md](docs/THESIS.md) (§29 of the docs).
 
 ## License
 
