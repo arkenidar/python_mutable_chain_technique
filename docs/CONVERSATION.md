@@ -502,6 +502,32 @@ composition level; the stable cell (deliberate aliasing) is exactly the thing
 needing the most care - shared mutable cells must be single-owned + borrowed or
 immutable to stay compositional.
 
+## 26. Recursive verifiable reduction (certified compilation / superoptimization)
+
+Verification is recursive, so use recursion to *reduce* systems while preserving
+behavior: a fragment is a black box with a **denotation** (observable I/O), which
+is the invariant. A rewrite is valid iff it preserves the denotation
+(behavioral equivalence / refinement). Apply rewrites bottom-up; by
+compositionality the whole program's behavior is preserved.
+
+Three ingredients (same restrictions, now doing work):
+1. **well-founded rewrites** (size strictly decreases -> terminates at a normal
+   form; confluence -> unique minimal form),
+2. **closed black boxes** (no aliasing -> summarizable in isolation),
+3. **compositionality** (reduce the parts => reduce the whole).
+
+Levels: source -> IR -> byte-code; at byte-code level, peephole rewrites shrink
+instruction sequences. For a copy-jump-peek/poke machine, program size =
+instruction count = code memory, so reducing byte-code = reducing memory.
+
+Nibble payoff: behavioral equivalence of two programs is decidable by enumeration
+(run both over all reachable states), so size reduction becomes *exact* -
+superoptimization for free (find the provably smallest equivalent byte-code).
+
+Honest limit: equivalence of arbitrary programs is undecidable. Two sound
+strategies: prove each rewrite rule once and reuse (CompCert), or bound the
+machine and check exhaustively (nibble superoptimization).
+
 ## Chronological summary
 
 1. Studied `mutable_chain.*` (7 ports) — the list-wrapper indirection pattern.
