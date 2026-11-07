@@ -433,6 +433,50 @@ reclamation trades away expressiveness. The design axis is **machine size ↔
 hatches" is the large-machine compromise; the nibble is the small-machine extreme
 that can afford full state search. (4-bit machines are real: Intel 4004.)
 
+## 23. Composable nibble machines: expressivity vs knowability
+
+Fixed composition of finite machines = a finite machine (product of states), so it
+is **not** Turing-complete and its state space grows `2^(64k)` for k nibble
+machines — knowability (exact enumeration) dies fast. Unbounded composition
+(recursion/loops that grow memory) is Turing-complete but reintroduces
+undecidability. So **full expressivity + full knowability is impossible**
+(theorem: Turing ⟺ unbounded state ⟺ undecidable).
+
+The working middle ground is **hierarchical composition with finite I/O
+interfaces** (hardware verification's assume-guarantee): each nibble machine is a
+finite transducer over small ports; you verify it exactly and compose
+*summaries*, never the product state space. This gives scalable expressivity +
+local knowability.
+
+Two principled endpoints:
+- **Total languages** (Coq/Agda/Idris/Lean): every program terminates, so
+  "knowable" completely, but not Turing-complete (only well-founded recursion).
+- **Turing-complete + approximate verification**: abstract interpretation (sound
+  over-approx), bounded model checking (exact to K steps), theorem proving.
+
+"Knowability" has a cost ladder, each reducing to halting: termination →
+liveness/reclamation → full correctness (strictly harder).
+
+Design axis: "total/bounded" (knowable, less expressive) ↔ "unbounded +
+approximate" (expressive, partly knowable); composable nibble machines sit in the
+productive middle.
+
+## 24. Boundedness as the design principle (unboundedness is out of scope)
+
+"Unboundedness" is a *conditional marker*, not a leak: undecidability and Turing
+completeness enter **only if** the design lets the bound grow. A fixed-bound
+design rules them out by construction, so for it they are moot.
+
+- bounded, small (nibble) -> exact + enumerable (trivially knowable);
+- bounded, large -> decidable in principle; keep knowability *practical* via
+  compositional methods (hierarchical nibble machines + finite summaries);
+- unbounded -> undecidable (not built here).
+
+Commit to fixed bounds => exact knowability; the only thing given up is unbounded
+input sizes (which is what Turing-completeness requires anyway). The impossibility
+theorem only concerns *unbounded* systems, so a bounded design resolves the
+tension in favor of knowability - a feature, not a limitation.
+
 ## Chronological summary
 
 1. Studied `mutable_chain.*` (7 ports) — the list-wrapper indirection pattern.
