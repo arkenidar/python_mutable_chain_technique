@@ -520,13 +520,53 @@ Levels: source -> IR -> byte-code; at byte-code level, peephole rewrites shrink
 instruction sequences. For a copy-jump-peek/poke machine, program size =
 instruction count = code memory, so reducing byte-code = reducing memory.
 
-Nibble payoff: behavioral equivalence of two programs is decidable by enumeration
-(run both over all reachable states), so size reduction becomes *exact* -
-superoptimization for free (find the provably smallest equivalent byte-code).
+Nibble payoff: *verification* becomes exact - but only **fixed-input** exact.
+"Equivalent on one given memory" is checkable by reachable-state enumeration
+(cheap). "Equivalent for all 2^64 memories" is decidable but NOT enumerable in
+practice - it needs SMT/symbolic methods (Souper/STOKE) or the test-vector
+heuristic (Massalin). And the *search* over candidates is combinatorial
+(~801^n instruction forms: length 1 ~ 801, length 2 ~ 642k, length 3 ~ 514M).
+So superoptimization is "exact but combinatorial", not "free".
 
 Honest limit: equivalence of arbitrary programs is undecidable. Two sound
-strategies: prove each rewrite rule once and reuse (CompCert), or bound the
-machine and check exhaustively (nibble superoptimization).
+strategies for the *search*: prove each rewrite rule once and reuse (CompCert /
+equality saturation), or enumerate candidates and verify (Massalin / SMT). On a
+bounded machine the *verification* is decidable (fixed-input by enumeration,
+all-input by SMT), but the *search* is |I|^n - the real wall.
+
+## 27. Hutter Prize and compression as semantics-preserving reduction
+
+Compression = approximate Kolmogorov complexity: the shortest (decompressor +
+payload) that reproduces the data losslessly. It is §26's recursive reduction
+applied to *data*, where the invariant is losslessness and the rewrites are
+provably-invertible transforms.
+
+The two superoptimization strategies map: "prove rules once" -> lossless
+transforms (LZ/BWT/PPM/CM/arithmetic) for the *data*; "enumerate on a bounded
+machine" -> the *decompressor program* (small), not the 1 GB payload (2^(8·10^9)
+is non-enumerable).
+
+Key simplification: a decompressor (the whole artifact: program + payload) has
+**no variable input** - it is judged on one input and must produce one output.
+So "equivalence" collapses to "outputs the same thing on that one input",
+checkable by simply running it (fixed-input, exact). Verification was never the
+hard part; the wall is *search*. This is Kolmogorov complexity's setup (an
+inputless program): uncomputable on unbounded machines (halting sneaks into the
+search), computable-in-principle on bounded machines (cycle detection decides
+"halts and outputs x"), but still |I|^n combinatorial - and the machine must be
+large enough to hold the output.
+
+Hutter Prize pipeline: (1) probability modeling (context mixing / neural) - the
+"intelligence"; (2) entropy coding (arithmetic / ANS) to the Shannon limit;
+(3) preprocessing (BWT/MTF/dictionary); (4) minimize decompressor program size
+(superoptimization fits here - the prize counts decompressor size); (5) massive
+compute (ensembles).
+
+Notable way: Shannon's source-coding theorem bounds compression by source entropy
+under the best model; going lower requires better *prediction* = modeling the
+generating process = Hutter's compression->AGI thesis. English text entropy ~1
+bit/byte => ~8-10x is near the practical floor; current best (nncp/cmix) ~114 MB
+on enwik9 (~8.8x), above the 100 MB target.
 
 ## Chronological summary
 

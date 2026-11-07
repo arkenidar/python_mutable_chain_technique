@@ -27,12 +27,14 @@ exhaustive reachability (cycle detection) — no approximation, no GC, no refcou
 
 - [`src/vm.py`](src/vm.py) — the machine + exhaustive reachability + liveness (Python).
 - [`src/vm.nim`](src/vm.nim) — the same machine + analysis (Nim).
+- [`src/superoptimize.py`](src/superoptimize.py) — fixed-input superoptimizer (find the shortest behaviorally-equivalent program).
 - [`docs/DESIGN.md`](docs/DESIGN.md) — the design rationale and corollaries.
 
 ## Run
 
 ```bash
 python3 copy_jump_vm/src/vm.py
+python3 copy_jump_vm/src/superoptimize.py
 nim c -r --hints:off --outdir:/tmp/nimcell copy_jump_vm/src/vm.nim
 ```
 
