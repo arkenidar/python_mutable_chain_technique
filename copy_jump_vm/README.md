@@ -28,6 +28,7 @@ exhaustive reachability (cycle detection) — no approximation, no GC, no refcou
 - [`src/vm.py`](src/vm.py) — the machine + exhaustive reachability + liveness (Python).
 - [`src/vm.nim`](src/vm.nim) — the same machine + analysis (Nim).
 - [`src/bbjj.py`](src/bbjj.py) — the real RESM/BBJJ machine (one instruction: copy a bit + 2-way jump) with loop detection.
+- [`src/bbjj_reduce.py`](src/bbjj_reduce.py) — a VERIFIED peephole/size reducer (R1 self-copy, R2 jump-to-next, R3 try-remove) that runs on real copyjumpvm `.prg.txt` programs and checks bit-identical output.
 - [`src/superoptimize.py`](src/superoptimize.py) — fixed-input superoptimizer (find the shortest behaviorally-equivalent program).
 - [`docs/DESIGN.md`](docs/DESIGN.md) — the design rationale and corollaries.
 
@@ -37,6 +38,7 @@ exhaustive reachability (cycle detection) — no approximation, no GC, no refcou
 python3 copy_jump_vm/src/vm.py
 python3 copy_jump_vm/src/superoptimize.py
 python3 copy_jump_vm/src/bbjj.py
+python3 copy_jump_vm/src/bbjj_reduce.py ../copyjumpvm/vm_programs/<program>.prg.txt
 nim c -r --hints:off --outdir:/tmp/nimcell copy_jump_vm/src/vm.nim
 ```
 
