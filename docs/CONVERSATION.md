@@ -361,6 +361,11 @@ syntax makes it decidable *and* cheap.
 
 ## 20. The copy-jump-peek/poke machine
 
+> **Correction (§28):** the real machine is RESM/BBJJ (one instruction: copy a bit +
+> 2-way jump), not this 4-op simplification; its arithmetic and loops are built in
+> software. This section's point (finite control + unbounded memory → undecidability)
+> still holds.
+
 A minimal machine with `copy` (move data), `jump` (branch), `peek` (read memory),
 and `poke` (write memory) is **Turing-complete**, and — like every Turing machine
 — it is a **finite object** (finite instruction set, finite state, finite program)
@@ -534,6 +539,11 @@ equality saturation), or enumerate candidates and verify (Massalin / SMT). On a
 bounded machine the *verification* is decidable (fixed-input by enumeration,
 all-input by SMT), but the *search* is |I|^n - the real wall.
 
+> **Correction (§28):** on the real machine (software arithmetic and loops), the
+> shortest fixed-input program can use loops — a loop is far shorter than its
+> unrolling — so straight-line BFS is optimal only for straight-line fragments; the
+> general case is loop-aware (outlining / equality saturation / peephole).
+
 ## 27. Hutter Prize and compression as semantics-preserving reduction
 
 Compression = approximate Kolmogorov complexity: the shortest (decompressor +
@@ -567,6 +577,47 @@ under the best model; going lower requires better *prediction* = modeling the
 generating process = Hutter's compression->AGI thesis. English text entropy ~1
 bit/byte => ~8-10x is near the practical floor; current best (nncp/cmix) ~114 MB
 on enwik9 (~8.8x), above the 100 MB target.
+
+## 28. The real machine: RESM/BBJJ (correction of §20/§21/§26)
+
+The actual copyjumpvm is **RESM** ("Raw Execution-Step Machine") aka **BBJJ**
+("Bit Bit Jump Jump") — a single-instruction (OISC/URISC) machine, NOT the
+16-cell poke/copy/peek machine modeled earlier. One instruction, four operands:
+
+    [COPY_FROM, COPY_TO, IP_CASE_0, IP_CASE_1]
+    1. fetch the bit at COPY_FROM
+    2. write that bit to COPY_TO
+    3. jump to IP_CASE_0 or IP_CASE_1, chosen by a path-selector bit
+
+Textual form decomposes it: `m <dst> <src>` (copy one bit) and
+`j <cond> <l0> <l1>` (2-way branch), plus `j <label>` (unconditional) and
+`j <cond> <label>` (if 0 -> next else label). `@` is *dereference* (read ADDR_BITS
+bits LSB-first as the address) = peek/poke/computed-goto — an addressing mode,
+not an opcode. Bit memory (13-bit addresses ≈ 8 Kbit); bits 0 and 1 are constant
+0/1 sources. **No ALU, no call stack**: arithmetic = gate circuits + ripple-carry
+full adders; subroutine reuse = structural return / return register + dispatch /
+a software stack (for recursion). Witnesses: MD5 (~376k instructions,
+bit-identical to hashlib) and xorshift32.
+
+Two corrections to earlier sections:
+- §20 said "no ALU" and implied "no arithmetic/loops" — **wrong**: the ALU and
+  loops are software-built, and that is how MD5/xorshift work.
+- §26 implied "the shortest fixed-input program is straight-line" — **wrong**: a
+  loop compactly expresses repeated work (a 32-bit ripple-carry add as a loop is
+  far shorter than its unrolling), so jumps genuinely reduce size. Straight-line
+  BFS (superoptimize.py) is optimal only for straight-line fragments; the general
+  shortest program is loop-aware (loop synthesis is undecidable; practical tools =
+  outlining / procedural abstraction, equality saturation, peephole).
+
+What still holds: bounded memory -> decidable verification; fixed-input
+verification = "run it once"; the search-vs-verification split; the composability
+restrictions (§25). The repo's halting detection (iloop -> "infinite loop",
+tloop -> "terminated") is §19-21 made concrete.
+
+Practical smart size-reduction already in the repo: outlining / procedural
+abstraction (outliner.js: integer_sum 233 -> 94 by sharing a repeated 29-instr
+full-adder subgraph via return register + dispatch), peephole, and brute-force
+synthesis (arkenidar/simple, for the decompressor direction).
 
 ## Chronological summary
 
