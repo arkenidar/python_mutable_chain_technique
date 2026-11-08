@@ -910,6 +910,18 @@ match-finder / dictionary / entropy-coder / predictor sub-routines) can hybridiz
 proven codecs — which is how cmix and LZMA were themselves composed. Fitness is exact
 (size, speed = instructions, ratio); acceptance is a proof.
 
+**Caveat — search is a dead end for exact-output synthesis.** The above applies to
+*spec-based* synthesis (evolve toward a gradable spec, where partial correctness gives
+a gradient). The decompressor-generator goal is *exact-output reproduction*: fitness is
+all-or-nothing — a program 99% correct is still wrong, with no gradient toward the
+last bit — so GA is no better than brute force. Evolving *program + data* together
+collapses to a degenerate "store the data" solution. For exact output, the workable
+path is **constructive, not search**: compile the algorithm (`cc.py`), then apply
+*verified* rewrites / factoring / loop synthesis (monotonic, provably
+behavior-preserving) — §29.7. Rule of thumb: *GA for "evolve toward a spec" — maybe;
+GA for "reproduce this exact output" — no.*
+
+
 ### 14. The tower of abstraction: ideas span layers
 
 The machine is the *bottom* of a tower, and inventions live *up* the tower:
