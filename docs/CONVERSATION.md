@@ -1,5 +1,9 @@
 # Stable Cell — Conceptual Notes (conversation documentation)
 
+> This is the **raw discourse log** — the full, growing record of the conversation.
+> The distilled, stable synthesis is in [`THESIS.md`](THESIS.md); see
+> [`INDEX.md`](INDEX.md) for the reading guide.
+
 This document records the conceptual arc behind the code in this directory: the
 technique itself, and how it relates to garbage collection, reactive updates,
 and memory/resource allocation and reclamation.

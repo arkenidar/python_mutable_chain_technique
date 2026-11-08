@@ -157,19 +157,26 @@ See [BUILD.md](BUILD.md) for detailed build instructions.
 ├── mutable_chain.rb      # Ruby
 ├── CMakeLists.txt        # CMake build for C/C++
 ├── BUILD.md              # Detailed build instructions
-├── docs/                  # Conceptual + process record (CONVERSATION, RECORD)
+├── docs/                  # Theory: INDEX, THESIS, CONVERSATION, RECORD, STRUCTURE
 ├── stable_cell/           # The stable cell primitive (JS + Nim)
 ├── copy_jump_vm/          # Compile-time reclamation experiment (copy/jump/peek/poke)
 └── README.md             # This file
 ```
 
-## Related: The Stable Cell Primitive
+## Related: The Stable Cell Primitive & the Research Program
 
 The stable cell (the `[t]` / `c[0]` / `c[0] = t` mutable-box pattern) is the
 primitive underneath this technique — see [stable_cell/README.md](stable_cell/README.md)
-for the spec and runnable JS/Nim implementations, [docs/CONVERSATION.md](docs/CONVERSATION.md)
-for the full conceptual write-up, and [copy_jump_vm/README.md](copy_jump_vm/README.md)
-for the compile-time reclamation experiment. A complete synthesis is in [docs/THESIS.md](docs/THESIS.md) (§29 of the docs).
+for the spec and runnable JS/Nim implementations, and
+[copy_jump_vm/README.md](copy_jump_vm/README.md) for the RESM/BBJJ machine and its
+optimizer/reducer.
+
+Beyond the technique, this repo holds the **theory** half of a broader research program
+(from the stable cell up to bit-level program compression). **Start at
+[docs/INDEX.md](docs/INDEX.md)** for the reading guide: the canonical synthesis is
+[docs/THESIS.md](docs/THESIS.md), the full discourse log is
+[docs/CONVERSATION.md](docs/CONVERSATION.md), and the structure/growth policy is
+[docs/STRUCTURE.md](docs/STRUCTURE.md).
 
 ## License
 

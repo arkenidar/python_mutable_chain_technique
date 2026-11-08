@@ -1,6 +1,6 @@
 # The unified research program — from Hutter-prize compression to a bit-level minimal machine that unifies the stable cell, verifiability, and data-relations, and yields a reduction algorithm
 
-> This is the self-contained synthesis; it is also recorded as §29 of `docs/CONVERSATION.md`.
+> This is the **canonical synthesis** — the distilled, stable statement of the idea. The full raw discourse (every idea, correction, and open question) is archived in [`CONVERSATION.md`](CONVERSATION.md); see [`INDEX.md`](INDEX.md) for the reading guide.
 
 ## 1. Origin — the Hutter Prize (compression as intelligence)
 
